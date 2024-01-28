@@ -1,12 +1,18 @@
 #include <iostream>
-#include <map>
+#include <string>
+#include <vector>
+
+struct Transaction{
+    std::string operationType;
+    int amount = 0;
+};
 
 struct Account {
     std::string id;
     std::string passwd;
     std::string cvv;
     int balance = 0;
-    std::map<std::string, int> transactionHistory;
+    std::vector<Transaction> transactionHistory;
 };
 
 void displayMenu() {
@@ -78,7 +84,7 @@ void deposit(Account &acc) {
     acc.balance += amount;
     std::cout << "Pomyslnie wplacono " << amount << "pln" << std::endl << std::endl;
 
-    acc.transactionHistory.insert(std::pair<std::string, int>("DEPOSIT", amount));
+    acc.transactionHistory.emplace_back("DEPOSIT", amount);
 }
 
 void withdraw(Account &acc) {
@@ -97,7 +103,7 @@ void withdraw(Account &acc) {
             exit(211);
         }
 
-        std::cout << "Aby wyplacic srodki prosimy wprowadzic kod CVV: ";
+        std::cout << std::endl << "Aby wyplacic srodki prosimy wprowadzic kod CVV: ";
         std::cin >> cvv;
 
         if(cvv == acc.cvv) {
@@ -122,23 +128,22 @@ void withdraw(Account &acc) {
         } else {
             acc.balance -= amount;
             std::cout << "Pomyslnie wyplacono " << amount << "pln" << std::endl << std::endl;
-            acc.transactionHistory.insert(std::pair<std::string, int>("WITHDRAW", amount));
+            acc.transactionHistory.emplace_back("WITHDRAW", amount);
             break;
         }
     }
 }
 
-void transactionHistory(Account &acc) {
+void printTransactionHistory(const Account &acc) {
     if(acc.transactionHistory.empty()) {
         std::cout << std::endl << "Nie posiadasz dokonanych transakcji na swoim koncie!" << std::endl << std::endl;
     } else {
         std::cout << std::endl << "=================== HISTORIA TRANSAKCJI ===================" << std::endl;
-        for(auto & it : acc.transactionHistory) {
-            std::cout << "Typ transakcji: " << it.first << std::endl << "Kwota: " << it.second << " pln" << std::endl << std::endl;
+        for(const auto & it : acc.transactionHistory) {
+            std::cout << "Typ transakcji: " << it.operationType << std::endl << "Kwota: " << it.amount << " pln" << std::endl << std::endl;
         }
         std::cout << "=================== HISTORIA TRANSAKCJI ===================" << std::endl << std::endl;
     }
-
 }
 
 int main() {
@@ -161,7 +166,7 @@ int main() {
                     withdraw(acc);
                     break;
                 case 4:
-                    transactionHistory(acc);
+                    printTransactionHistory(acc);
                     break;
                 case 5:
                     exit(0);
@@ -176,4 +181,4 @@ int main() {
 }
 
 
-// Do naprawienia historia transakcji (nie wyswietla prawidlowo wszystkich dokonanych transakcji na koncie)
+// Prosty system bankowy (Wyswietlanie stanu konta, wplacanie i wyplacanie srodkow, historia transakcji konta) + logowanie do konta
